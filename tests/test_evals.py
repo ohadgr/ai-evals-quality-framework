@@ -5,7 +5,10 @@ import pytest
 
 from evals.deterministic_evals import evaluate_response
 from evals.llm_judge import evaluate_with_llm
-from evals.quality_gate import passes_quality_gate
+from evals.quality_gate import (
+    passes_quality_gate,
+    AGENT_LLM_PASS_RATE_THRESHOLD
+)
 from evals.support_agent import generate_support_response
 from evals.evaluation_pipeline import (
     run_deterministic_evaluation,
@@ -202,7 +205,9 @@ def test_llm_evaluation_pipeline():
             "false_negatives": 0
         }
 
-    with allure.step("Verify Judge decision matches human label for every case"):
+    with allure.step(
+        "Verify Judge decision matches human label for every case"
+    ):
         for result in results:
             assert result["actual"] == result["expected"]
 
@@ -258,7 +263,9 @@ def test_agent_evaluation_pipeline():
 
     print("\nAgent Evaluation Results")
 
-    with allure.step("Process evaluation results for each Golden Dataset case"):
+    with allure.step(
+        "Process evaluation results for each Golden Dataset case"
+    ):
         for result in results:
             print(f"\n{result['id']}")
             print(f"Response: {result['response']}")
@@ -295,8 +302,20 @@ def test_agent_evaluation_pipeline():
         f"({summary['llm_pass_rate']:.0%})"
     )
     print(
+        f"Required LLM pass rate: "
+        f"{AGENT_LLM_PASS_RATE_THRESHOLD:.0%}"
+    )
+    print(
         f"Evaluator disagreements: "
         f"{summary['disagreements']}"
+    )
+    print(
+        f"Errors: "
+        f"{summary['errors']}"
+    )
+    print(
+        f"Error rate: "
+        f"{summary['error_rate']:.0%}"
     )
     print(
         f"Average agent latency: "
@@ -315,4 +334,10 @@ def test_agent_evaluation_pipeline():
         assert len(results) == len(test_cases)
 
     with allure.step("Verify Agent Quality Gate passes"):
-        assert quality_gate_passed is True
+        assert quality_gate_passed is True, (
+            "Agent Quality Gate FAILED: "
+            f"LLM pass rate={summary['llm_pass_rate']:.0%}, "
+            f"required={AGENT_LLM_PASS_RATE_THRESHOLD:.0%}, "
+            f"errors={summary['errors']}, "
+            f"error rate={summary['error_rate']:.0%}"
+        )
