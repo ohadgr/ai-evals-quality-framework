@@ -7,9 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   evaluate:
@@ -40,7 +38,11 @@ jobs:
           sudo mv allure-2.35.1 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
+      # We allow this step to finish so the Allure report can still
+      # be generated and published when the Quality Gate fails.
       - name: Run AI evaluations
+        id: evals
+        continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
@@ -68,9 +70,6 @@ jobs:
           echo "Repository=${{ github.repository }}" \
             >> allure-results/environment.properties
 
-          echo "Workflow=${{ github.workflow }}" \
-            >> allure-results/environment.properties
-
       - name: Generate Allure report
         if: always()
         run: |
@@ -78,30 +77,121 @@ jobs:
             --clean \
             -o allure-report
 
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results-${{ github.run_id }}
-          path: allure-results
-          retention-days: 30
-
-      - name: Upload Allure HTML report
+      # Keep a downloadable snapshot for every run.
+      - name: Upload Allure artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report-${{ github.run_id }}
           path: allure-report
-          retention-days: 30
+          retention-days: 90
 
-      - name: Upload GitHub Pages artifact
-        if: success() && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: allure-report
+      # Publish only main runs.
+      # PASS and FAIL are written to different directories.
+      - name: Publish Allure report
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          EVAL_OUTCOME: ${{ steps.evals.outcome }}
+        run: |
+          git clone \
+            --branch gh-pages \
+            --single-branch \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            pages
 
-      - name: Add evaluation summary
+          if [ "$EVAL_OUTCOME" = "success" ]; then
+            REPORT_TYPE="pass"
+            REPORT_LABEL="PASS"
+          else
+            REPORT_TYPE="fail"
+            REPORT_LABEL="FAIL"
+          fi
+
+          rm -rf "pages/$REPORT_TYPE"
+          mkdir -p "pages/$REPORT_TYPE"
+
+          cp -R allure-report/. "pages/$REPORT_TYPE/"
+
+          cat > pages/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AI Evals Quality Framework</title>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                max-width: 700px;
+                margin: 80px auto;
+                padding: 0 20px;
+                line-height: 1.6;
+              }
+
+              h1 {
+                margin-bottom: 8px;
+              }
+
+              .subtitle {
+                color: #555;
+                margin-bottom: 40px;
+              }
+
+              .report {
+                display: block;
+                padding: 20px;
+                margin: 20px 0;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                text-decoration: none;
+                color: inherit;
+              }
+
+              .report:hover {
+                background: #f7f7f7;
+              }
+            </style>
+          </head>
+
+          <body>
+            <h1>AI Evals Quality Framework</h1>
+
+            <p class="subtitle">
+              Allure reports demonstrating successful and failed
+              AI Quality Gate executions.
+            </p>
+
+            <a class="report" href="./pass/">
+              <strong>✅ Successful Quality Gate</strong><br>
+              View the latest successful AI evaluation report
+            </a>
+
+            <a class="report" href="./fail/">
+              <strong>❌ Failed Quality Gate</strong><br>
+              View the latest intentional Quality Gate failure
+            </a>
+          </body>
+          </html>
+          EOF
+
+          cd pages
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No Pages changes to publish."
+          else
+            git commit -m "Publish ${REPORT_LABEL} Allure report - run ${{ github.run_id }}"
+            git push origin gh-pages
+          fi
+
+      - name: Add job summary
         if: always()
+        env:
+          EVAL_OUTCOME: ${{ steps.evals.outcome }}
         run: |
           echo "## 🤖 AI Evals / Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -110,50 +200,23 @@ jobs:
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Run Number | \`${{ github.run_number }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Evaluation | \`$EVAL_OUTCOME\` |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "### Evaluation Framework" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Golden Dataset" >> $GITHUB_STEP_SUMMARY
-          echo "- Deterministic Evaluator" >> $GITHUB_STEP_SUMMARY
-          echo "- LLM-as-a-Judge" >> $GITHUB_STEP_SUMMARY
-          echo "- Agent Quality Gate" >> $GITHUB_STEP_SUMMARY
-          echo "- pytest + Allure" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Published Allure Reports" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "Allure artifacts for this run include the GitHub Run ID." \
+          echo "- [✅ Successful Quality Gate](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/pass/)" \
             >> $GITHUB_STEP_SUMMARY
 
-  deploy:
-    name: Publish Allure Report
-    if: success() && github.ref == 'refs/heads/main'
-    needs: evaluate
-    runs-on: ubuntu-latest
+          echo "- [❌ Failed Quality Gate](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/fail/)" \
+            >> $GITHUB_STEP_SUMMARY
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy Allure report to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Add Allure report link to job summary
+      # continue-on-error above allowed us to publish the failed report.
+      # Now restore the actual CI failure.
+      - name: Enforce AI Quality Gate
+        if: always() && steps.evals.outcome != 'success'
         run: |
-          echo "## 📊 AI Evals Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "### [📊 Open Allure Report ↗](${{ steps.deployment.outputs.page_url }})" \
-            >> $GITHUB_STEP_SUMMARY
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "| Published Report | |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Run Number | \`${{ github.run_number }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "AI Quality Gate failed."
+          exit 1
