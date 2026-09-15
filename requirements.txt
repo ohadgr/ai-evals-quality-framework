@@ -2,3 +2,4 @@ openai
 pytest
 python-dotenv
 allure-pytest
+allure-python-commons

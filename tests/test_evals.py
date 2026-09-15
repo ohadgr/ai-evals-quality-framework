@@ -333,11 +333,16 @@ def test_agent_evaluation_pipeline():
     with allure.step("Verify all Golden Dataset cases were evaluated"):
         assert len(results) == len(test_cases)
 
+    gate_message = (
+        f"Agent Quality Gate: "
+        f"{'PASS' if quality_gate_passed else 'FAIL'} | "
+        f"LLM pass rate={summary['llm_pass_rate']:.0%} | "
+        f"required={AGENT_LLM_PASS_RATE_THRESHOLD:.0%} | "
+        f"errors={summary['errors']} | "
+        f"error rate={summary['error_rate']:.0%}"
+    )
+
+    print(f"\n{gate_message}")
+
     with allure.step("Verify Agent Quality Gate passes"):
-        assert quality_gate_passed is True, (
-            "Agent Quality Gate FAILED: "
-            f"LLM pass rate={summary['llm_pass_rate']:.0%}, "
-            f"required={AGENT_LLM_PASS_RATE_THRESHOLD:.0%}, "
-            f"errors={summary['errors']}, "
-            f"error rate={summary['error_rate']:.0%}"
-        )
+        assert quality_gate_passed is True, gate_message

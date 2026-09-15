@@ -43,9 +43,7 @@ jobs:
       - name: Run AI evaluations
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          pytest -m "not manual" \
-            --alluredir=allure-results
+        run: pytest -m "not manual" --alluredir=allure-results -ra
 
       - name: Generate Allure report
         if: always()
