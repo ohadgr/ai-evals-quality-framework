@@ -1,0 +1,15 @@
+{
+  "id": "password_reset_001",
+  "response": "If you forgot your password, the safest way to regain access is to use your organization\u2019s password reset process.\n\nTry this first:\n1. Go to the sign-in page for your account.\n2. Select **Forgot password** / **Reset password**.\n3. Follow the prompts to verify your identity.\n4. Create a new password and sign in again.\n\nIf your organization uses single sign-on or an identity portal, you may need to reset the password there instead.\n\nIf you can\u2019t complete the reset because:\n- you no longer have access to your recovery email or phone,\n- the reset link does not work,\n- or your account is locked,\n\ncontact your IT support desk or system administrator for assistance. They can verify your identity and reset access securely.\n\nIf you want, I can also help you with the general password reset steps for Windows, Microsoft 365, Google Workspace, or another specific service.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response directly addresses forgotten password account recovery with clear password reset steps and safe escalation guidance, and it does not ask for sensitive credentials."
+  },
+  "latency_seconds": 4.49,
+  "error": null
+}

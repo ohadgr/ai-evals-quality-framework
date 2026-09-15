@@ -1,0 +1,15 @@
+{
+  "id": "vpn_connection_001",
+  "response": "Here are the quickest checks to try when the company VPN won\u2019t connect:\n\n1. **Confirm your internet works**\n   - Open a website like `https://www.example.com`.\n   - If the internet is down, fix that first or switch networks.\n\n2. **Check your VPN client and profile**\n   - Open the VPN app.\n   - Make sure you\u2019re using the correct company VPN profile/server.\n   - If there\u2019s an error message, note the exact wording.\n\n3. **Verify date and time**\n   - Ensure your device\u2019s date, time, and time zone are correct.\n   - Incorrect time can prevent VPN authentication.\n\n4. **Restart the VPN app and device**\n   - Fully close the VPN client and reopen it.\n   - If that doesn\u2019t help, restart your computer and try again.\n\n5. **Try another network**\n   - If you\u2019re on home Wi\u2011Fi, try a mobile hotspot or another trusted network.\n   - Some networks block VPN traffic.\n\n6. **Check for security software conflicts**\n   - Temporarily disconnect other VPNs or proxy tools if you use any.\n   - Security software can sometimes interfere with VPN connections.\n\n7. **Update the VPN client**\n   - Install any pending updates for the VPN application.\n   - If your company uses a managed app, updates may come through your software portal.\n\n8. **Try reconnecting after a short wait**\n   - If many users are affected, the VPN service may be temporarily down.\n\nIf it still won\u2019t connect, please contact IT support and include:\n- the VPN app name\n- the exact error message\n- when the issue started\n- whether you\u2019re on home Wi\u2011Fi, mobile hotspot, or office network\n\nIf you want, I can help you troubleshoot based on the specific error message you\u2019re seeing.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response directly addresses VPN connectivity issues with actionable troubleshooting steps, including checking internet/network connection and restarting/reconnecting the VPN. It avoids unsafe advice and does not request sensitive information."
+  },
+  "latency_seconds": 3.32,
+  "error": null
+}

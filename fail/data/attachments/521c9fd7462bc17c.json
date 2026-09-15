@@ -1,0 +1,12 @@
+{
+  "total": 5,
+  "deterministic_passed": 4,
+  "deterministic_pass_rate": 0.8,
+  "llm_passed": 5,
+  "llm_pass_rate": 1.0,
+  "disagreements": 1,
+  "errors": 0,
+  "error_rate": 0.0,
+  "average_latency_seconds": 3.19,
+  "max_latency_seconds": 4.49
+}
