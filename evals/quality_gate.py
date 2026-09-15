@@ -1,4 +1,4 @@
-AGENT_LLM_PASS_RATE_THRESHOLD = 0.8
+AGENT_LLM_PASS_RATE_THRESHOLD = 1.1
 
 
 def passes_quality_gate(scores: dict) -> bool:
