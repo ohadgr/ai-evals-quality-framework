@@ -8,5 +8,5 @@ def passes_quality_gate(scores: dict) -> bool:
 def passes_agent_quality_gate(summary: dict) -> bool:
     return (
         summary["error_rate"] == 0
-        and summary["llm_pass_rate"] >= 0.8
+        and summary["llm_pass_rate"] >= 1.0
     )
