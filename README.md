@@ -2,7 +2,16 @@
 
 [![AI Evals](https://github.com/ohadgr/ai-evals-quality-framework/actions/workflows/ai-evals.yml/badge.svg)](https://github.com/ohadgr/ai-evals-quality-framework/actions/workflows/ai-evals.yml)
 
-[📊 View Latest Allure Report](https://ohadgr.github.io/ai-evals-quality-framework/)
+## 📊 Live Allure Reports
+
+- [📊 All Published Reports](https://ohadgr.github.io/ai-evals-quality-framework/)
+- [✅ Successful Quality Gate](https://ohadgr.github.io/ai-evals-quality-framework/pass/)
+- [❌ Failed Quality Gate](https://ohadgr.github.io/ai-evals-quality-framework/fail/)
+
+The reports demonstrate both the normal successful evaluation flow and an
+intentional Quality Gate failure that blocks the CI pipeline.
+
+---
 
 A lightweight AI quality evaluation framework for an IT support agent.
 
@@ -99,10 +108,10 @@ This project implements that approach for a small AI IT support agent.
 ```
 
 The deterministic evaluator and the LLM Judge are independent evaluators.
-Neither evaluator receives the result of the other.
 
-Their results are combined later by the evaluation pipeline according to
-the quality-gate policy.
+Neither evaluator receives the result of the other. Their results are
+combined later by the evaluation pipeline according to the Quality Gate
+policy.
 
 ---
 
@@ -172,9 +181,8 @@ Each case contains:
 The `good_response` and `bad_response` fields are human-labelled reference
 examples.
 
-They are not exact expected outputs from the AI Agent.
-
-They are used primarily to validate and calibrate the evaluators.
+They are not exact expected outputs from the AI Agent. They are used to
+validate and calibrate the evaluators against known examples.
 
 ---
 
@@ -199,7 +207,7 @@ The Agent follows basic behavioral rules such as:
 - Never recommend bypassing security controls
 - Escalate to IT when administrator access is required
 
-The generated response is then evaluated by the framework.
+The newly generated response is then evaluated by the framework.
 
 ---
 
@@ -393,8 +401,8 @@ evaluator and the LLM Judge.
 
 ## Agent Quality Gate
 
-The Agent-level gate determines whether the complete evaluation run is
-acceptable.
+The Agent-level Quality Gate determines whether the complete evaluation
+run is acceptable.
 
 The current demo policy requires:
 
@@ -427,29 +435,75 @@ reliability of the evaluator and the risk of the requirement.
 
 ---
 
-## Quality Gate Failure Reporting
+## Quality Gate Failure Demonstration
 
-When the Agent Quality Gate fails, the test reports the actual quality
-signal and the required threshold.
+The repository contains published Allure reports for both successful and
+failed Quality Gate executions.
 
-Example:
+### Successful run
+
+[✅ View Successful Quality Gate Report](https://ohadgr.github.io/ai-evals-quality-framework/pass/)
+
+This demonstrates the normal evaluation flow when the Agent satisfies the
+configured quality requirements.
+
+### Intentional failed run
+
+[❌ View Failed Quality Gate Report](https://ohadgr.github.io/ai-evals-quality-framework/fail/)
+
+The failure was intentionally triggered using an unreachable temporary
+threshold to verify that an AI quality regression:
 
 ```text
-Agent Quality Gate: FAIL |
-LLM pass rate=60% |
-required=80% |
-errors=0 |
-error rate=0%
+Fails the Agent Quality Gate
+        ↓
+Fails the pytest test
+        ↓
+Fails the GitHub Actions run
+        ↓
+Blocks the CI pipeline
 ```
 
-This makes CI failures easier to investigate than a generic assertion
-failure.
+The threshold was then restored to its normal value.
 
-The project was also tested with an intentionally unreachable temporary
-threshold to verify that a failed AI Quality Gate correctly fails the
-pytest run and blocks the CI pipeline.
+The failed Allure report is preserved separately from the successful
+report so that both execution paths can be inspected.
 
-The repository's final configuration uses the normal 80% threshold.
+---
+
+## CI Traceability
+
+Every generated Allure report contains CI metadata identifying the exact
+GitHub Actions execution that produced it.
+
+The report includes:
+
+```text
+GitHub Run ID
+GitHub Run Number
+Commit SHA
+Branch
+Repository
+Workflow
+```
+
+This makes each report traceable back to a specific CI execution and
+source-code version.
+
+The GitHub Pages site keeps the latest successful and failed reports
+separately:
+
+```text
+/
+├── pass/    → latest successful Quality Gate report
+└── fail/    → latest failed Quality Gate report
+```
+
+A successful run updates only `/pass/`, while a failed run updates only
+`/fail/`.
+
+In addition, each CI execution stores its generated Allure report as a
+run-specific GitHub Actions artifact.
 
 ---
 
@@ -623,7 +677,7 @@ Verify all Golden Dataset cases were evaluated
 Verify Agent Quality Gate passes
 ```
 
-The end-to-end Agent evaluation also attaches:
+The end-to-end Agent evaluation attaches:
 
 - Evaluation summary
 - Individual ticket evaluation results
@@ -635,18 +689,22 @@ The end-to-end Agent evaluation also attaches:
 This makes the report useful for both test execution visibility and
 failure investigation.
 
-Latest published report:
+### Published Reports
 
-[📊 View Latest Allure Report](https://ohadgr.github.io/ai-evals-quality-framework/)
+[📊 All Reports](https://ohadgr.github.io/ai-evals-quality-framework/)
+
+[✅ Successful Quality Gate](https://ohadgr.github.io/ai-evals-quality-framework/pass/)
+
+[❌ Failed Quality Gate](https://ohadgr.github.io/ai-evals-quality-framework/fail/)
 
 ---
 
 ## CI/CD
 
 GitHub Actions runs the automated AI evaluation suite on changes to the
-repository.
+main branch and on pull requests.
 
-The CI pipeline:
+The CI pipeline follows this flow:
 
 ```text
 Checkout repository
@@ -661,18 +719,38 @@ Generate Allure results
         ↓
 Apply Agent Quality Gate
         ↓
+Publish Allure report
+        ↓
 PASS / FAIL CI
 ```
+
+When pytest detects a Quality Gate failure, the workflow temporarily
+continues so that the failed Allure report can still be generated and
+published.
+
+The CI failure is then explicitly restored at the end of the workflow.
+
+Conceptually:
+
+```text
+Quality Gate FAIL
+       ↓
+Capture failure
+       ↓
+Generate failed Allure report
+       ↓
+Publish /fail/
+       ↓
+Fail GitHub Actions job
+```
+
+This ensures that failed evaluations remain observable without allowing
+the pipeline to appear successful.
 
 The OpenAI API key is provided to the workflow through a GitHub Actions
 repository secret.
 
 No API credentials are stored in the source code.
-
-The workflow has been executed successfully remotely in GitHub Actions.
-
-A deliberate Quality Gate failure was also used to verify that an AI
-quality regression can fail the test suite and block the CI pipeline.
 
 ---
 
@@ -738,7 +816,7 @@ Open the report locally:
 allure serve allure-results
 ```
 
-Manual learning/debug tests can be run separately:
+Manual learning and calibration tests can be run separately:
 
 ```bash
 pytest -m manual
@@ -751,7 +829,7 @@ pytest -m manual
 This project is intentionally small.
 
 A production AI quality platform could extend the same architecture with
-the following capabilities.
+additional capabilities.
 
 ### Production Sampling
 
