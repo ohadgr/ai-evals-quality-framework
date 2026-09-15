@@ -43,7 +43,33 @@ jobs:
       - name: Run AI evaluations
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest -m "not manual" --alluredir=allure-results -ra
+        run: |
+          pytest -m "not manual" \
+            --alluredir=allure-results \
+            -ra
+
+      - name: Add CI metadata to Allure
+        if: always()
+        run: |
+          mkdir -p allure-results
+
+          echo "GitHub Run ID=${{ github.run_id }}" \
+            >> allure-results/environment.properties
+
+          echo "GitHub Run Number=${{ github.run_number }}" \
+            >> allure-results/environment.properties
+
+          echo "Commit=${{ github.sha }}" \
+            >> allure-results/environment.properties
+
+          echo "Branch=${{ github.ref_name }}" \
+            >> allure-results/environment.properties
+
+          echo "Repository=${{ github.repository }}" \
+            >> allure-results/environment.properties
+
+          echo "Workflow=${{ github.workflow }}" \
+            >> allure-results/environment.properties
 
       - name: Generate Allure report
         if: always()
@@ -56,11 +82,20 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
+          name: allure-results-${{ github.run_id }}
           path: allure-results
+          retention-days: 30
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ github.run_id }}
+          path: allure-report
+          retention-days: 30
 
       - name: Upload GitHub Pages artifact
-        if: always() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v4
         with:
           path: allure-report
@@ -70,6 +105,15 @@ jobs:
         run: |
           echo "## 🤖 AI Evals / Test Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "| CI Metadata | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Run Number | \`${{ github.run_number }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
           echo "### Evaluation Framework" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- Golden Dataset" >> $GITHUB_STEP_SUMMARY
@@ -78,11 +122,13 @@ jobs:
           echo "- Agent Quality Gate" >> $GITHUB_STEP_SUMMARY
           echo "- pytest + Allure" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📊 Allure report will be published after the deployment job completes." >> $GITHUB_STEP_SUMMARY
+
+          echo "Allure artifacts for this run include the GitHub Run ID." \
+            >> $GITHUB_STEP_SUMMARY
 
   deploy:
-    name: Allure Report
-    if: always() && github.ref == 'refs/heads/main'
+    name: Publish Allure Report
+    if: success() && github.ref == 'refs/heads/main'
     needs: evaluate
     runs-on: ubuntu-latest
 
@@ -95,22 +141,19 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-      - name: Add Allure report to job summary
-        if: always()
+      - name: Add Allure report link to job summary
         run: |
           echo "## 📊 AI Evals Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### [📊 Allure Report ↗](${{ steps.deployment.outputs.page_url }})" >> $GITHUB_STEP_SUMMARY
+
+          echo "### [📊 Open Allure Report ↗](${{ steps.deployment.outputs.page_url }})" \
+            >> $GITHUB_STEP_SUMMARY
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Latest AI evaluation report generated and published by this workflow." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "---" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Report contents:**" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Generated Support Agent responses" >> $GITHUB_STEP_SUMMARY
-          echo "- Deterministic evaluator results" >> $GITHUB_STEP_SUMMARY
-          echo "- LLM Judge scores" >> $GITHUB_STEP_SUMMARY
-          echo "- Agent Quality Gate" >> $GITHUB_STEP_SUMMARY
-          echo "- Evaluation summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Agent latency" >> $GITHUB_STEP_SUMMARY
+
+          echo "| Published Report | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Run Number | \`${{ github.run_number }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
