@@ -1,0 +1,15 @@
+{
+  "id": "account_locked_001",
+  "response": "Your account is locked due to multiple failed sign-in attempts.\n\nTry these safe steps first:\n1. Wait 15\u201330 minutes and try signing in again.\n2. Make sure you\u2019re using the correct username and password.\n3. If you recently changed your password, try the new one on all devices.\n4. Check whether Caps Lock or Num Lock is affecting your entry.\n5. If your company uses self-service password reset, use that to reset your password and then try again.\n\nIf the account is still locked after the wait period, or if you keep getting locked out, contact your IT support team or help desk. They can verify the cause and unlock the account safely.",
+  "deterministic_passed": false,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response correctly addresses a locked account after failed login attempts, explains to wait and retry, and advises contacting IT/support to unlock the account if needed. It includes safe guidance only and does not request credentials or suggest sharing passwords."
+  },
+  "latency_seconds": 1.96,
+  "error": null
+}

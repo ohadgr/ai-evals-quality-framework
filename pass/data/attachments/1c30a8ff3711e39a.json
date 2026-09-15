@@ -1,0 +1,15 @@
+{
+  "id": "password_reset_001",
+  "response": "If you forgot your password, use your organization\u2019s standard password reset process.\n\nTry these steps:\n1. Go to the sign-in page for your account.\n2. Select **Forgot password** or **Reset password**.\n3. Follow the prompts to verify your identity.\n4. Create a new password and sign in again.\n\nIf you do not see a reset option, or if your account is locked out, contact your IT support team or help desk. They can verify your identity and reset access for you safely.\n\nIf you want, I can also help you draft a message to IT support.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response clearly explains the password reset/forgot password account recovery process, gives actionable steps, and does not request or expose credentials."
+  },
+  "latency_seconds": 3.44,
+  "error": null
+}

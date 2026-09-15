@@ -1,0 +1,15 @@
+{
+  "id": "vpn_connection_001",
+  "response": "Sorry you\u2019re having trouble connecting to the company VPN. Here are the safest, most common checks to try:\n\n1. **Confirm your internet connection**\n   - Make sure you can browse regular websites.\n   - If possible, try a different network or temporarily disconnect/reconnect Wi\u2011Fi.\n\n2. **Check the VPN app/client**\n   - Close the VPN client completely and reopen it.\n   - If there\u2019s an update available for the VPN app, install it.\n   - Restart your computer and try again.\n\n3. **Verify the VPN server/profile**\n   - Make sure you\u2019re selecting the correct company VPN profile/server.\n   - If you recently changed locations or network type, try reconnecting from a different network.\n\n4. **Check for security software conflicts**\n   - Some antivirus or firewall tools can block VPN connections.\n   - If you recently changed security settings, restore them and try again.\n   - Don\u2019t disable security protections unless your IT team has instructed you to.\n\n5. **Look for error messages**\n   - Note any exact error code or message shown by the VPN client. This helps identify whether it\u2019s an authentication, network, or certificate issue.\n\n6. **Time and date**\n   - Ensure your device\u2019s date and time are set correctly. Incorrect time can cause VPN authentication failures.\n\n7. **Try a different device if available**\n   - If another company-managed device can connect, the issue may be specific to your computer.\n\nIf the VPN still won\u2019t connect, this may require **IT support or admin-side troubleshooting**. Please contact your IT helpdesk and include:\n- The exact VPN error message/code\n- Your device type and operating system\n- The time the issue started\n- Whether you are on home Wi\u2011Fi, mobile hotspot, or another network\n\nIf you want, I can help you narrow it down based on the **exact error message** you\u2019re seeing.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response directly addresses VPN connectivity issues, includes network/internet checks and restart/reconnect troubleshooting, and avoids unsafe advice like disabling the firewall permanently."
+  },
+  "latency_seconds": 3.41,
+  "error": null
+}
