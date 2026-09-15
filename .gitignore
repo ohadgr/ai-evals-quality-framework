@@ -1,0 +1,7 @@
+.venv/
+.env
+__pycache__/
+.idea/
+# AI evaluation reports
+allure-results/
+allure-report/
