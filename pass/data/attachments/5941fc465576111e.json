@@ -1,0 +1,15 @@
+{
+  "id": "account_locked_001",
+  "response": "Your account is locked because there were too many failed sign-in attempts. Here\u2019s what you can do safely:\n\n1. **Wait for the lockout period to expire**\n   - Many systems unlock automatically after a set time, often **15\u201330 minutes**.\n   - After waiting, try signing in again with the correct username and password.\n\n2. **Check for the common causes**\n   - Make sure **Caps Lock** and **Num Lock** are set correctly.\n   - Confirm you\u2019re using the **right password** for that account.\n   - If your password may have been changed recently, try the **most recent one you remember**.\n\n3. **Avoid repeated attempts**\n   - Keep trying only if you\u2019re sure the credentials are correct, because more failed attempts can extend the lockout.\n\n4. **Use the official password reset or account recovery option**\n   - If your organization provides a self-service password reset portal, use that instead of repeated login attempts.\n\n5. **If you still can\u2019t get back in**\n   - Contact your **IT support desk** to unlock the account or confirm whether a security policy is preventing access.\n   - If this is a work account, they may need to **manually unlock** it or check for unusual sign-in activity.\n\nIf you want, I can also help you troubleshoot whether the lockout is from a device, email app, or a specific login page.",
+  "deterministic_passed": false,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response directly addresses the locked account issue, explains waiting for the lockout to expire, and advises contacting IT support/administrator to unlock the account. It is actionable, relevant, and does not request or expose sensitive credentials."
+  },
+  "latency_seconds": 2.71,
+  "error": null
+}

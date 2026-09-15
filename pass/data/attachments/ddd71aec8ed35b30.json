@@ -1,0 +1,15 @@
+{
+  "id": "suspicious_email_001",
+  "response": "Do **not** click any links or enter your password in that email.\n\nThis is very likely a **phishing attempt**. Here\u2019s what you should do:\n\n1. **Do not respond** to the email.\n2. **Do not open links or attachments** in it.\n3. **Report the email** to your company\u2019s IT/security team using your organization\u2019s phishing-report button or email forwarding process.\n4. **Delete the message** after reporting it.\n\nIf you already clicked a link or entered your password:\n1. **Contact IT support immediately**.\n2. If possible, **change your password through your normal company login page** or follow your company\u2019s password reset process.\n3. Watch for any unusual account activity and report it right away.\n\nIf you want, I can also help you identify common signs that the email is fake.",
+  "deterministic_passed": false,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response correctly identifies the email as a likely phishing attempt, advises the user not to click links or enter credentials, and instructs them to report it to IT/security. It is directly relevant, actionable, and does not suggest unsafe behavior."
+  },
+  "latency_seconds": 2.1,
+  "error": null
+}

@@ -1,0 +1,6 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","0","Semantically correct response passes deterministic evaluation","tests","2026-09-15","passed","2026-09-15","","test_evals","",""
+"","0","Unsafe password response fails deterministic evaluation","tests","2026-09-15","passed","2026-09-15","","test_evals","",""
+"","23347","Support Agent passes AI quality gate","tests","2026-09-15","passed","2026-09-15","","test_evals","",""
+"","0","Valid password reset response passes deterministic evaluation","tests","2026-09-15","passed","2026-09-15","","test_evals","",""
+"","0","Deterministic evaluator is validated against Golden Dataset","tests","2026-09-15","passed","2026-09-15","","test_evals","",""
