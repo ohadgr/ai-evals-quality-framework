@@ -15,6 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ---------------------------------------------------------
+      # Setup
+      # ---------------------------------------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -38,8 +42,14 @@ jobs:
           sudo mv allure-2.35.1 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-      # We allow this step to finish so the Allure report can still
-      # be generated and published when the Quality Gate fails.
+      # ---------------------------------------------------------
+      # AI Evaluations
+      # ---------------------------------------------------------
+
+      # continue-on-error allows the workflow to generate and publish
+      # the Allure report even when the AI Quality Gate fails.
+      #
+      # The actual CI failure is restored at the end of the workflow.
       - name: Run AI evaluations
         id: evals
         continue-on-error: true
@@ -49,6 +59,10 @@ jobs:
           pytest -m "not manual" \
             --alluredir=allure-results \
             -ra
+
+      # ---------------------------------------------------------
+      # Allure metadata
+      # ---------------------------------------------------------
 
       - name: Add CI metadata to Allure
         if: always()
@@ -70,6 +84,13 @@ jobs:
           echo "Repository=${{ github.repository }}" \
             >> allure-results/environment.properties
 
+          echo "Workflow=${{ github.workflow }}" \
+            >> allure-results/environment.properties
+
+      # ---------------------------------------------------------
+      # Generate Allure
+      # ---------------------------------------------------------
+
       - name: Generate Allure report
         if: always()
         run: |
@@ -77,7 +98,7 @@ jobs:
             --clean \
             -o allure-report
 
-      # Keep a downloadable snapshot for every run.
+      # Keep a downloadable snapshot of every CI run.
       - name: Upload Allure artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -86,8 +107,20 @@ jobs:
           path: allure-report
           retention-days: 90
 
-      # Publish only main runs.
-      # PASS and FAIL are written to different directories.
+      # ---------------------------------------------------------
+      # Publish to GitHub Pages
+      # ---------------------------------------------------------
+
+      # Only main is published.
+      #
+      # Successful runs update:
+      #   /pass/
+      #
+      # Failed runs update:
+      #   /fail/
+      #
+      # Therefore a successful run never overwrites the failed report,
+      # and a failed run never overwrites the successful report.
       - name: Publish Allure report
         if: always() && github.ref == 'refs/heads/main'
         env:
@@ -107,25 +140,32 @@ jobs:
             REPORT_LABEL="FAIL"
           fi
 
+          echo "Publishing $REPORT_LABEL report to /$REPORT_TYPE/"
+
           rm -rf "pages/$REPORT_TYPE"
           mkdir -p "pages/$REPORT_TYPE"
 
           cp -R allure-report/. "pages/$REPORT_TYPE/"
 
+          # Main GitHub Pages landing page.
+          # It always provides access to both stored reports.
           cat > pages/index.html <<'EOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
             <title>AI Evals Quality Framework</title>
+
             <style>
               body {
                 font-family: Arial, sans-serif;
-                max-width: 700px;
+                max-width: 720px;
                 margin: 80px auto;
-                padding: 0 20px;
+                padding: 0 24px;
                 line-height: 1.6;
+                color: #24292f;
               }
 
               h1 {
@@ -133,27 +173,38 @@ jobs:
               }
 
               .subtitle {
-                color: #555;
+                color: #57606a;
                 margin-bottom: 40px;
               }
 
               .report {
                 display: block;
-                padding: 20px;
+                padding: 22px;
                 margin: 20px 0;
-                border: 1px solid #ddd;
+                border: 1px solid #d0d7de;
                 border-radius: 10px;
                 text-decoration: none;
                 color: inherit;
               }
 
               .report:hover {
-                background: #f7f7f7;
+                background: #f6f8fa;
+              }
+
+              .report-title {
+                font-size: 18px;
+                font-weight: bold;
+              }
+
+              .description {
+                margin-top: 5px;
+                color: #57606a;
               }
             </style>
           </head>
 
           <body>
+
             <h1>AI Evals Quality Framework</h1>
 
             <p class="subtitle">
@@ -162,14 +213,25 @@ jobs:
             </p>
 
             <a class="report" href="./pass/">
-              <strong>✅ Successful Quality Gate</strong><br>
-              View the latest successful AI evaluation report
+              <div class="report-title">
+                ✅ Successful Quality Gate
+              </div>
+
+              <div class="description">
+                View the latest successful AI evaluation report.
+              </div>
             </a>
 
             <a class="report" href="./fail/">
-              <strong>❌ Failed Quality Gate</strong><br>
-              View the latest intentional Quality Gate failure
+              <div class="report-title">
+                ❌ Failed Quality Gate
+              </div>
+
+              <div class="description">
+                View the latest intentional AI Quality Gate failure.
+              </div>
             </a>
+
           </body>
           </html>
           EOF
@@ -177,44 +239,94 @@ jobs:
           cd pages
 
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
 
           if git diff --cached --quiet; then
-            echo "No Pages changes to publish."
+            echo "No GitHub Pages changes to publish."
           else
-            git commit -m "Publish ${REPORT_LABEL} Allure report - run ${{ github.run_id }}"
+            git commit \
+              -m "Publish ${REPORT_LABEL} Allure report - run ${{ github.run_id }}"
+
             git push origin gh-pages
           fi
+
+      # ---------------------------------------------------------
+      # GitHub Actions Job Summary
+      # ---------------------------------------------------------
 
       - name: Add job summary
         if: always()
         env:
           EVAL_OUTCOME: ${{ steps.evals.outcome }}
         run: |
-          echo "## 🤖 AI Evals / Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "| CI Metadata | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Run ID | \`${{ github.run_id }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Run Number | \`${{ github.run_number }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Evaluation | \`$EVAL_OUTCOME\` |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "### 📊 Published Allure Reports" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "- [✅ Successful Quality Gate](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/pass/)" \
+          echo "## 🤖 AI Evals / Test Summary" \
             >> $GITHUB_STEP_SUMMARY
 
-          echo "- [❌ Failed Quality Gate](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/fail/)" \
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "| CI Metadata | Value |" \
             >> $GITHUB_STEP_SUMMARY
 
-      # continue-on-error above allowed us to publish the failed report.
-      # Now restore the actual CI failure.
+          echo "|---|---|" \
+            >> $GITHUB_STEP_SUMMARY
+
+          echo "| Run ID | \`${{ github.run_id }}\` |" \
+            >> $GITHUB_STEP_SUMMARY
+
+          echo "| Run Number | \`${{ github.run_number }}\` |" \
+            >> $GITHUB_STEP_SUMMARY
+
+          echo "| Branch | \`${{ github.ref_name }}\` |" \
+            >> $GITHUB_STEP_SUMMARY
+
+          echo "| Commit | \`${{ github.sha }}\` |" \
+            >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Show only the report that belongs to THIS run.
+          if [ "$EVAL_OUTCOME" = "success" ]; then
+
+            echo "## ✅ Quality Gate PASSED" \
+              >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "[📊 View Allure Report](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/pass/)" \
+              >> $GITHUB_STEP_SUMMARY
+
+          else
+
+            echo "## ❌ Quality Gate FAILED" \
+              >> $GITHUB_STEP_SUMMARY
+
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "[📊 View Failed Allure Report](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/fail/)" \
+              >> $GITHUB_STEP_SUMMARY
+
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "---" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "[View all published reports](https://${{ github.repository_owner }}.github.io/ai-evals-quality-framework/)" \
+            >> $GITHUB_STEP_SUMMARY
+
+      # ---------------------------------------------------------
+      # Restore CI failure
+      # ---------------------------------------------------------
+
+      # pytest was allowed to continue so that the failed Allure report
+      # could be generated and published.
+      #
+      # Now fail the GitHub Actions job if the evaluation itself failed.
       - name: Enforce AI Quality Gate
         if: always() && steps.evals.outcome != 'success'
         run: |
