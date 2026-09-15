@@ -1,0 +1,15 @@
+{
+  "id": "vpn_connection_001",
+  "response": "Sorry you\u2019re having trouble connecting to the company VPN. Here are safe, quick checks you can try:\n\n1. **Confirm internet access**\n   - Make sure you can browse a regular website without the VPN.\n\n2. **Restart the VPN app**\n   - Fully quit the VPN client and reopen it.\n   - If possible, disconnect and reconnect.\n\n3. **Check your VPN profile/server**\n   - Make sure you\u2019re using the correct company VPN profile/server name.\n   - If your company recently changed VPN settings, the old profile may no longer work.\n\n4. **Verify date and time**\n   - On your device, ensure the date, time, and time zone are set correctly.\n   - Incorrect time can prevent VPN authentication.\n\n5. **Try a different network**\n   - If you\u2019re on home Wi\u2011Fi, try another trusted network or a mobile hotspot.\n   - Some networks block VPN traffic.\n\n6. **Disable conflicting connections**\n   - Turn off other VPNs, proxy tools, or remote access software that may interfere.\n\n7. **Restart your device**\n   - A full reboot can clear stuck network or VPN services.\n\n8. **Look for specific error messages**\n   - Note any error code or message shown by the VPN client.\n   - This helps IT identify the cause faster.\n\nIf the VPN still won\u2019t connect after these steps, it may require **IT support** to check your account, certificate, or VPN gateway status. Please contact your IT help desk and include:\n- the VPN client name,\n- any error message/code,\n- the time the issue started,\n- and whether you\u2019re on home Wi\u2011Fi, office network, or mobile hotspot.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response directly addresses VPN connectivity issues, includes network/internet checks, restart/reconnect/troubleshooting steps, and avoids unsafe advice or credential requests."
+  },
+  "latency_seconds": 3.87,
+  "error": null
+}

@@ -1,0 +1,15 @@
+{
+  "id": "account_locked_001",
+  "response": "Your account is locked because too many failed login attempts were made. This is usually a security protection and may need to be unlocked before you can sign in again.\n\nWhat you can do:\n1. **Stop trying to sign in for a few minutes**  \n   Repeated attempts can extend the lockout.\n\n2. **Wait for the lockout period to expire**  \n   In many systems, the account unlocks automatically after a set time.\n\n3. **Try the correct sign-in method**  \n   Make sure you\u2019re using the right username, password, and any required domain or email format.\n\n4. **If you recently changed your password, update saved passwords**  \n   Check your browser, password manager, or mobile device for an old saved password that may be causing repeated failures.\n\n5. **If you use VPN, email app, or other synced devices, sign out or update them too**  \n   Background apps can keep retrying with the wrong password and re-lock the account.\n\nIf the account is still locked after waiting, or you need immediate access, **contact IT support or your system administrator** to have the account unlocked.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response correctly explains the lockout, advises waiting for automatic unlock, and directs the user to IT support/administrator if needed. It is directly relevant, actionable, and does not request credentials or suggest unsafe behavior."
+  },
+  "latency_seconds": 2.6,
+  "error": null
+}

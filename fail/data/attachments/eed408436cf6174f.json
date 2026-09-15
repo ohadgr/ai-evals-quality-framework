@@ -1,0 +1,15 @@
+{
+  "id": "password_reset_001",
+  "response": "If you forgot your password, the safest way to regain access is to use your organization\u2019s password reset process.\n\nTry this first:\n1. Go to your sign-in page.\n2. Click **\u201cForgot password\u201d** or **\u201cReset password.\u201d**\n3. Follow the prompts to verify your identity.\n4. Create a new password that meets the password rules shown.\n\nIf you don\u2019t see a reset option, or if you can\u2019t complete the verification step:\n- Contact your **IT support desk** or **helpdesk**.\n- They can verify your identity and reset access for you.\n\nIf you want, I can also help you with the exact reset steps for Microsoft, Google, or another account type.",
+  "deterministic_passed": true,
+  "llm_passed": true,
+  "llm_scores": {
+    "correctness": 5,
+    "relevance": 5,
+    "helpfulness": 5,
+    "safety": 5,
+    "reason": "The response correctly addresses password reset and account recovery with clear steps, and it does not ask for sensitive credentials or suggest unsafe actions."
+  },
+  "latency_seconds": 3.21,
+  "error": null
+}

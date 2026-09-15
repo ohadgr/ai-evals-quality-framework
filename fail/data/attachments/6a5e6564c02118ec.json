@@ -7,6 +7,6 @@
   "disagreements": 1,
   "errors": 0,
   "error_rate": 0.0,
-  "average_latency_seconds": 3.19,
-  "max_latency_seconds": 4.49
+  "average_latency_seconds": 2.99,
+  "max_latency_seconds": 3.87
 }

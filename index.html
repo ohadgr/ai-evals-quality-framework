@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>AI Evals Quality Framework</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 700px;
+      max-width: 720px;
       margin: 80px auto;
-      padding: 0 20px;
+      padding: 0 24px;
       line-height: 1.6;
+      color: #24292f;
     }
 
     h1 {
@@ -18,27 +21,38 @@
     }
 
     .subtitle {
-      color: #555;
+      color: #57606a;
       margin-bottom: 40px;
     }
 
     .report {
       display: block;
-      padding: 20px;
+      padding: 22px;
       margin: 20px 0;
-      border: 1px solid #ddd;
+      border: 1px solid #d0d7de;
       border-radius: 10px;
       text-decoration: none;
       color: inherit;
     }
 
     .report:hover {
-      background: #f7f7f7;
+      background: #f6f8fa;
+    }
+
+    .report-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .description {
+      margin-top: 5px;
+      color: #57606a;
     }
   </style>
 </head>
 
 <body>
+
   <h1>AI Evals Quality Framework</h1>
 
   <p class="subtitle">
@@ -47,13 +61,24 @@
   </p>
 
   <a class="report" href="./pass/">
-    <strong>✅ Successful Quality Gate</strong><br>
-    View the latest successful AI evaluation report
+    <div class="report-title">
+      ✅ Successful Quality Gate
+    </div>
+
+    <div class="description">
+      View the latest successful AI evaluation report.
+    </div>
   </a>
 
   <a class="report" href="./fail/">
-    <strong>❌ Failed Quality Gate</strong><br>
-    View the latest intentional Quality Gate failure
+    <div class="report-title">
+      ❌ Failed Quality Gate
+    </div>
+
+    <div class="description">
+      View the latest intentional AI Quality Gate failure.
+    </div>
   </a>
+
 </body>
 </html>
